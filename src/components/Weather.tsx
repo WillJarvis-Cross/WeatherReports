@@ -4,10 +4,31 @@ import { useState } from 'react'
 import axios from 'axios'
 import { NextPage } from 'next' // Import NextPage type
 
+interface WeatherData {
+    name: string
+    main: {
+      temp: number
+    }
+    weather: {
+      description: string
+    }[]
+  }
+
+  interface City {
+    name: string
+    sys: {
+      country: string
+    }
+  }
+  
+  interface ApiResponse {
+    list: City[]
+  }
+
 const Weather: NextPage = () => {
     const [city, setCity] = useState('')
     const [suggestions, setSuggestions] = useState<string[]>([])
-    const [weather, setWeather] = useState<any>(null)
+    const [weather, setWeather] = useState<WeatherData | null>(null)
     
 
   const fetchWeather = async () => {
@@ -30,10 +51,10 @@ const Weather: NextPage = () => {
     
     try {
       const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY
-      const response = await axios.get(
+      const response = await axios.get<ApiResponse>(
         `https://api.openweathermap.org/data/2.5/find?q=${query}&type=like&appid=${apiKey}`
       )
-      setSuggestions(response.data.list.map((city: any) => city.name + ', ' + city.sys.country))
+      setSuggestions(response.data.list.map((city: City) => city.name + ', ' + city.sys.country))
     } catch (error) {
       console.error('Error fetching city suggestions:', error)
     }
@@ -56,7 +77,7 @@ const Weather: NextPage = () => {
     <div className="flex flex-col items-center justify-center h-screen bg-blue-100">
       <h1 className="text-4xl font-bold mb-4">Weather App</h1>
       <div className="relative">
-        <div>
+        <div className="space-x-4">
             <input
             type="text"
             value={city}
