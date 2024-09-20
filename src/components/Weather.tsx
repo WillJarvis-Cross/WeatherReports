@@ -27,10 +27,6 @@ interface City {
   }
 }
 
-interface ApiResponse {
-  list: City[]
-}
-
 type WeatherCondition = 'clear' | 'rain' | 'snow' | 'clouds'
 
 // Utility function to format time
