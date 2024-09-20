@@ -29,6 +29,7 @@ const Weather: NextPage = () => {
     const [city, setCity] = useState('')
     const [suggestions, setSuggestions] = useState<string[]>([])
     const [weather, setWeather] = useState<WeatherData | null>(null)
+    const [background, setBackground] = useState('https://weather-reports-djvbsdjsk.s3.amazonaws.com/sunny.jpg')
     
 
   const fetchWeather = async () => {
@@ -37,7 +38,27 @@ const Weather: NextPage = () => {
       const response = await axios.get(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
       )
+      const weatherCondition = response.data.weather[0].main.toLowerCase()
+      console.log(weatherCondition)
       setWeather(response.data)
+
+      // Set background based on weather condition using S3 URLs
+      switch (weatherCondition) {
+        case 'clear':
+          setBackground('https://weather-reports-djvbsdjsk.s3.amazonaws.com/sunny.jpg')
+          break
+        case 'rain':
+          setBackground('https://weather-reports-djvbsdjsk.s3.amazonaws.com/rainy.jpg')
+          break
+        case 'snow':
+          setBackground('https://weather-reports-djvbsdjsk.s3.amazonaws.com/snowy.jpg')
+          break
+        case 'clouds':
+          setBackground('https://weather-reports-djvbsdjsk.s3.amazonaws.com/cloudy.jpg')
+          break
+        default:
+          setBackground('https://weather-reports-djvbsdjsk.s3.amazonaws.com/sunny.jpg')
+      }
     } catch (error) {
       console.error('Error fetching weather data:', error)
     }
@@ -72,9 +93,16 @@ const Weather: NextPage = () => {
     fetchWeather()
   }
   
-
+  console.log(background)
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-blue-100">
+    <div className="flex flex-col items-center justify-center h-screen bg-blue-100"
+        style={{
+            backgroundImage: `url(${background})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100vh',
+        }}
+    >
       <h1 className="text-4xl font-bold mb-4">Weather App</h1>
       <div className="relative">
         <div className="space-x-4">
